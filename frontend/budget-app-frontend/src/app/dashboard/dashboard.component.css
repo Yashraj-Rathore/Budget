@@ -1,0 +1,38 @@
+/* dashboard.component.css */
+body {
+  background-color: #000 !important;  /* Ensure the background is set to black */
+}
+
+.dashboard-container {
+  padding: 2rem;
+  background-color: transparent;  /* Set to transparent so it inherits the black body background */
+  color: #fff;  /* Set the text color to white */
+}
+
+.jumbotron {
+  background-blend-mode: overlay;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  background-color: #464646; /* Darker color for better contrast with the black background */
+}
+
+.card {
+  background-color: #444; /* Set a dark color for cards to differentiate from the background */
+  border: none;  /* Remove borders to make cards blend well */
+}
+
+.card-header {
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #fff; /* Make sure card headers are white for readability */
+}
+
+.nav-link {
+  font-size: 1.2rem;
+  margin-right: 1rem;
+  color: #9acaf7;  /* Bright link color for better contrast on dark background */
+}
+
+.nav-link:hover {
+  color: #d4e3f6;  /* Lighter color for link hover effect */
+}
