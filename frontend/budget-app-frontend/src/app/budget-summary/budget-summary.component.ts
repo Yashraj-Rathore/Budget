@@ -71,60 +71,72 @@ export class BudgetSummaryComponent implements OnInit, AfterViewInit, OnDestroy 
 }
 
 
-  renderCharts(): void {
-    if (this.transactions.length > 0) {
-      const incomeTransactions = this.transactions.filter((t: Transaction) => t.type === 'income');
-      const expenseTransactions = this.transactions.filter((t: Transaction) => t.type === 'expense');
+ renderCharts(): void {
+  if (this.transactions.length > 0) {
+    const incomeTransactions = this.transactions.filter((t: Transaction) => t.type === 'income');
+    const expenseTransactions = this.transactions.filter((t: Transaction) => t.type === 'expense');
 
-      const totalIncome = incomeTransactions.reduce((sum: number, t: Transaction) => sum + t.amount, 0);
-      const totalExpenses = expenseTransactions.reduce((sum: number, t: Transaction) => sum + t.amount, 0);
+    // Convert amount to number to ensure correct summation
+    const totalIncome = incomeTransactions.reduce((sum: number, t: Transaction) => sum + Number(t.amount), 0);
+    const totalExpenses = expenseTransactions.reduce((sum: number, t: Transaction) => sum + Number(t.amount), 0);
 
-      this.renderIncomeExpenseChart(totalIncome, totalExpenses);
-      this.renderCategoryWiseChart(expenseTransactions);
-    }
+    // Logging to verify correct values
+    console.log('Total Income:', totalIncome);
+    console.log('Total Expenses:', totalExpenses);
+
+    this.renderIncomeExpenseChart(totalIncome, totalExpenses);
+    this.renderCategoryWiseChart(expenseTransactions);
   }
+}
+
 
   renderIncomeExpenseChart(totalIncome: number, totalExpenses: number): void {
-    const chartElement = this.el.nativeElement.querySelector('#incomeExpenseChart') as HTMLCanvasElement;
+  const chartElement = this.el.nativeElement.querySelector('#incomeExpenseChart') as HTMLCanvasElement;
 
-    if (chartElement) {
-      const ctx = chartElement.getContext('2d');
-      if (ctx) {
-        if (this.incomeExpenseChart) {
-          this.incomeExpenseChart.destroy(); // Destroy existing chart before creating a new one
-        }
+  if (chartElement) {
+    const ctx = chartElement.getContext('2d');
+    if (ctx) {
+      if (this.incomeExpenseChart) {
+        this.incomeExpenseChart.destroy(); // Destroy existing chart before creating a new one
+      }
 
-        const config: ChartConfiguration<'bar', number[], string> = {
-          type: 'bar',
-          data: {
-            labels: ['Income', 'Expenses'],
-            datasets: [
-              {
-                label: 'Amount in $',
-                data: [totalIncome, totalExpenses],
-                backgroundColor: ['#28a745', '#dc3545'],
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: {
-                display: true,
-                position: 'top',
-              },
+      // Check if totalExpenses is being passed correctly
+      console.log('Total Income:', totalIncome);
+      console.log('Total Expenses:', totalExpenses);
+
+      const config: ChartConfiguration<'bar', number[], string> = {
+        type: 'bar',
+        data: {
+          labels: ['Income', 'Expenses'],
+          datasets: [
+            {
+              label: 'Amount in $',
+              data: [totalIncome, totalExpenses], // Should have both values
+              backgroundColor: ['#28a745', '#dc3545'], // Green for income, Red for expenses
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
             },
           },
-        };
+        },
+      };
 
-        this.incomeExpenseChart = new Chart(ctx, config);
-      } else {
-        console.error('Failed to acquire context for Income vs Expense chart');
-      }
+      this.incomeExpenseChart = new Chart(ctx, config);
     } else {
-      console.error('IncomeExpenseChart canvas element not found.');
+      console.error('Failed to acquire context for Income vs Expense chart');
     }
+  } else {
+    console.error('IncomeExpenseChart canvas element not found.');
   }
+}
+
+
 
 renderCategoryWiseChart(expenseTransactions: Transaction[]): void {
     const chartElement = this.el.nativeElement.querySelector('#categoryWiseChart') as HTMLCanvasElement;
