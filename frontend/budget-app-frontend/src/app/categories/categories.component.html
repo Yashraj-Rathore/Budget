@@ -1,17 +1,20 @@
 <div class="manage-categories-container">
   <h2>Manage Categories</h2>
   <div class="category-input-container">
-    <input type="text" class="category-input" placeholder="Enter category name">
-    <button class="btn add-category-btn">Add Category</button>
+    <!-- Use Angular binding for input and form submit -->
+    <form (ngSubmit)="onSubmit()">
+      <input [(ngModel)]="category.name" name="name" type="text" class="category-input" placeholder="Enter category name" required>
+      <button class="btn add-category-btn" type="submit">{{ category.id ? 'Update' : 'Add' }} Category</button>
+    </form>
   </div>
 
   <div class="category-list-container">
     <ul class="category-list">
-      <li class="category-item">
-        <span class="category-name">Groceries</span>
+      <li *ngFor="let cat of categories" class="category-item">
+        <span class="category-name">{{ cat.name }}</span>
         <div class="action-buttons">
-          <button class="btn edit-category-btn">Edit</button>
-          <button class="btn delete-category-btn">Delete</button>
+          <button class="btn edit-category-btn" (click)="editCategory(cat)">Edit</button>
+          <button class="btn delete-category-btn" (click)="deleteCategory(cat.id)">Delete</button>
         </div>
       </li>
     </ul>
