@@ -1,0 +1,44 @@
+/* spending-analysis.component.css */
+.spending-analysis-container {
+  padding: 20px;
+  color: white;
+  background-color: #121212; /* Dark background */
+}
+
+h1 {
+  font-size: 2.5em;
+  margin-bottom: 0.5em;
+}
+
+h2 {
+  font-size: 1.8em;
+  margin-top: 1.5em;
+  color: #f5ba13; /* A golden yellow to make headings pop */
+}
+
+section {
+  margin-bottom: 2em;
+}
+
+.recommendations-section {
+  border-left: 5px solid #f5ba13;
+  padding-left: 15px;
+  margin-bottom: 2em;
+}
+
+.recommendations-box {
+  background-color: #282828;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+img {
+  max-width: 100%;
+  border: 1px solid #444;
+  border-radius: 8px;
+}
+
+p {
+  font-size: 1.2em;
+  margin: 0.3em 0;
+}

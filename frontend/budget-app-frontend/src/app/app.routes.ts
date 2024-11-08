@@ -9,6 +9,12 @@ export const routes: Routes = [
   { path: 'transactions', component: TransactionsComponent },
   { path: 'budget-summary', component: BudgetSummaryComponent },
   { path: 'categories', component: CategoriesComponent },
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' } // Default route to redirect to Dashboard
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' }, // Default route to redirect to Dashboard
+  {
+    path: 'spending-analysis',
+    loadChildren: () =>
+      import('./spending-analysis/spending-analysis.module').then(
+        (m) => m.SpendingAnalysisModule
+      ),
+  },
 ];
-
