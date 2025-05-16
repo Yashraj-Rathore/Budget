@@ -1,4 +1,4 @@
-# Budget Analysis Project
+# Spending Analysis Project
 
 ## Overview
 The Budget Analysis Project is a full-stack application designed to help users manage their personal finances effectively. It provides tools for visualizing income versus expenses, analyzing spending patterns, and receiving actionable insights to improve budgeting habits. The application integrates a backend service to collect financial data and a responsive frontend to display that information in an accessible and meaningful way.
