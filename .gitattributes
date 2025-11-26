@@ -11,8 +11,3 @@ frontend/**/out/* linguist-vendored=true
 # Ignore environment/config files if large
 frontend/**/environments/*.ts linguist-vendored=true
 
-# Mark Django migrations as not “main language”
-backend/**/migrations/* linguist-vendored=true
-
-# Ensure GitHub focuses on actual Python source code
-backend/**/*.py linguist-detectable=true
