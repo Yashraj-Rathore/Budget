@@ -1,0 +1,229 @@
+<div class="budget-summary-page">
+  <!-- Header -->
+  <div class="summary-header">
+    <h1>Budget Summary</h1>
+    <p>
+      Focused view of this month’s budget: how your planned limits compare to
+      actual spending and what you can safely spend for the rest of the month.
+    </p>
+  </div>
+
+  <!-- Top Metrics: budget-focused -->
+  <div class="summary-cards">
+    <!-- Planned Budget -->
+    <div class="summary-card">
+      <div class="summary-label">Planned Budget (This Month)</div>
+      <div class="summary-value">
+        {{ totalPlannedBudget | currency }}
+      </div>
+      <div class="summary-caption">
+        Sum of all category limits you set.
+      </div>
+    </div>
+
+    <!-- Actual Spend -->
+    <div class="summary-card">
+      <div class="summary-label">Actual Spend (This Month)</div>
+      <div class="summary-value negative">
+        {{ totalSpentThisMonth | currency }}
+      </div>
+      <div class="summary-caption">
+        All expenses recorded this month.
+      </div>
+    </div>
+
+    <!-- Remaining Budget -->
+    <div class="summary-card">
+      <div class="summary-label">Remaining Budget</div>
+      <div
+        class="summary-value"
+        [ngClass]="{ positive: remainingBudget >= 0, negative: remainingBudget < 0 }"
+      >
+        {{ remainingBudget | currency }}
+      </div>
+      <div class="summary-caption">
+        Planned budget minus this month’s spending.
+      </div>
+    </div>
+
+    <!-- Daily Spend Target -->
+    <div class="summary-card">
+      <div class="summary-label">Daily Spend Target</div>
+      <div class="summary-value">
+        <ng-container *ngIf="remainingBudget > 0 && daysLeftInMonth > 0; else overBudget">
+          {{ dailySpendTarget | currency }}
+        </ng-container>
+        <ng-template #overBudget> – </ng-template>
+      </div>
+      <div class="summary-caption">
+        <ng-container *ngIf="remainingBudget > 0 && daysLeftInMonth > 0">
+          You can spend about
+          {{ dailySpendTarget | currency }} per day for the next
+          {{ daysLeftInMonth }} days and stay on budget.
+        </ng-container>
+        <ng-container *ngIf="remainingBudget <= 0 || daysLeftInMonth === 0">
+          You’ve used your budget or the month is ending — any extra spending
+          will push you over.
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Middle: Category budget table + Insights -->
+  <div class="middle-layout">
+    <!-- Category Budget Table -->
+    <div class="card category-card">
+      <div class="card-title">Budget by Category (This Month)</div>
+
+      <div
+        class="category-row"
+        *ngFor="let row of categoryBudgetRows"
+      >
+        <div class="category-row-header">
+          <div class="category-name-wrap">
+            <span
+              class="category-color-dot"
+              *ngIf="row.color"
+              [style.background-color]="row.color"
+            ></span>
+            <span class="category-name">{{ row.name }}</span>
+          </div>
+
+          <span
+            class="status-chip"
+            [ngClass]="{
+              'status-over': row.status === 'over',
+              'status-warning': row.status === 'warning',
+              'status-under': row.status === 'under',
+              'status-nobudget': row.status === 'no-budget'
+            }"
+          >
+            {{
+              row.status === 'over'
+                ? 'Over budget'
+                : row.status === 'warning'
+                ? 'Near limit'
+                : row.status === 'under'
+                ? 'On track'
+                : 'No budget set'
+            }}
+          </span>
+        </div>
+
+        <div class="category-budget-grid">
+          <div class="budget-cell">
+            <div class="label">Budget</div>
+            <div class="value">
+              <ng-container *ngIf="row.budgetLimit != null && row.budgetLimit > 0; else noLimit">
+                {{ row.budgetLimit | currency }}
+              </ng-container>
+              <ng-template #noLimit>—</ng-template>
+            </div>
+          </div>
+
+          <div class="budget-cell">
+            <div class="label">Spent</div>
+            <div class="value negative">
+              {{ row.spent | currency }}
+            </div>
+          </div>
+
+          <div class="budget-cell">
+            <div class="label">Remaining</div>
+            <div class="value" [ngClass]="{ negative: (row.remaining ?? 0) < 0 }">
+              <ng-container *ngIf="row.remaining != null; else naRemaining">
+                {{ row.remaining | currency }}
+              </ng-container>
+              <ng-template #naRemaining>—</ng-template>
+            </div>
+          </div>
+        </div>
+
+        <div class="category-row-footer" *ngIf="row.percentUsed != null">
+          <div class="progress-bar">
+            <div
+              class="progress-inner"
+              [style.width.%]="row.percentUsed! > 120 ? 120 : row.percentUsed!"
+              [ngClass]="{
+                'progress-over': row.status === 'over',
+                'progress-warning': row.status === 'warning',
+                'progress-under': row.status === 'under'
+              }"
+            ></div>
+          </div>
+          <span class="category-share">
+            {{ row.percentUsed | number : '1.0-0' }}%
+          </span>
+        </div>
+      </div>
+
+      <div
+        *ngIf="categoryBudgetRows.length === 0"
+        class="empty-state"
+      >
+        No spending recorded for this month yet. Once you add expenses, you’ll
+        see how they track against your budgets here.
+      </div>
+    </div>
+
+    <!-- Insights -->
+    <div class="card insights-card">
+      <div class="card-title">Budget Insights</div>
+      <ul class="insights-list">
+        <li *ngIf="!hasAnyBudget">
+          You haven’t set any category limits yet. Define budgets on the
+          Categories page to unlock full budget tracking.
+        </li>
+
+        <li *ngIf="hasAnyBudget && remainingBudget >= 0">
+          You are currently <strong>within</strong> your overall budget by
+          <strong>{{ remainingBudget | currency }}</strong>.
+        </li>
+
+        <li *ngIf="hasAnyBudget && remainingBudget < 0">
+          You are currently <strong>over</strong> your overall budget by
+          <strong>{{ -remainingBudget | currency }}</strong>.
+        </li>
+
+        <li *ngIf="overBudgetCategories.length > 0">
+          Over-budget categories:
+          <strong>{{ overBudgetNames }}</strong>.
+        </li>
+
+        <li *ngIf="warningCategories.length > 0">
+          You are close to hitting the limit in:
+          <strong>{{ warningNames }}</strong>.
+        </li>
+
+        <li *ngIf="closestToLimit">
+          Closest to 100% of budget:
+          <strong>{{ closestToLimit.name }}</strong>
+          ({{ closestToLimit.percentUsed | number : '1.0-0' }}% used).
+        </li>
+
+        <li *ngIf="hasAnyBudget && totalPlannedBudget > 0">
+          Your total planned budget is
+          <strong>{{ totalPlannedBudget | currency }}</strong>. You’ve used
+          <strong>{{
+            (totalSpentThisMonth / totalPlannedBudget) * 100
+              | number : '1.0-0'
+          }}%</strong>
+          of it so far this month.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Charts: Planned vs Actual -->
+  <div class="charts-grid">
+    <div class="card chart-card">
+      <div class="card-title">Overall Planned vs Actual (This Month)</div>
+      <canvas id="overallBudgetChart"></canvas>
+    </div>
+
+    <div class="card chart-card">
+      <div class="card-title">Budget vs Actual by Category</div>
+      <canvas id="categoryBudgetChart"></canvas>
+    </div>
+  </div>
+</div>

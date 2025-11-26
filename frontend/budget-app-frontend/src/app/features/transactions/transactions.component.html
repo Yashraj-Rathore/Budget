@@ -1,0 +1,238 @@
+<!-- Header / Summary -->
+<div class="transactions-header">
+  <div class="transactions-subtitle">
+    Add new entries quickly, then filter and review your history below.
+  </div>
+  <div class="transactions-count">
+    Showing {{ filteredTransactions.length }} of {{ transactions.length }} transactions
+  </div>
+</div>
+
+<!-- Quick Add Transaction -->
+<div class="quick-add-card">
+  <h3 class="section-title">Quick Add Transaction</h3>
+
+  <div class="quick-add-row">
+    <!-- Amount -->
+    <div class="field">
+      <label class="field-label">Amount</label>
+      <input
+        type="number"
+        class="field-input"
+        [(ngModel)]="quickAmount"
+        placeholder="0.00"
+      />
+    </div>
+
+    <!-- Type -->
+    <div class="field">
+      <label class="field-label">Type</label>
+      <select
+        class="field-select type-select"
+        [(ngModel)]="quickType"
+      >
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+    </div>
+
+    <!-- Category -->
+    <div class="field">
+      <label class="field-label">Category</label>
+      <select
+        class="field-select"
+        [(ngModel)]="quickCategoryId"
+      >
+        <option [ngValue]="null">Uncategorised</option>
+        <option *ngFor="let cat of categories" [ngValue]="cat.id">
+          {{ cat.name }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Date -->
+    <div class="field">
+      <label class="field-label">Date</label>
+      <input
+        type="date"
+        class="field-input"
+        [(ngModel)]="quickDate"
+      />
+    </div>
+
+    <!-- Description -->
+    <div class="field flex-grow">
+      <label class="field-label">Description (optional)</label>
+      <input
+        type="text"
+        class="field-input"
+        [(ngModel)]="quickDescription"
+        placeholder="Paycheck, groceries, rent..."
+      />
+    </div>
+
+    <!-- Add button -->
+    <div class="field align-end">
+      <button class="btn-primary" (click)="onQuickAdd()">
+        Add
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Filters row -->
+<div class="filters-card">
+  <div class="filters-row">
+    <div class="field">
+      <label class="field-label">From</label>
+      <input
+        type="date"
+        class="field-input"
+        [(ngModel)]="filterFrom"
+      />
+    </div>
+
+    <div class="field">
+      <label class="field-label">To</label>
+      <input
+        type="date"
+        class="field-input"
+        [(ngModel)]="filterTo"
+      />
+    </div>
+
+    <div class="field">
+      <label class="field-label">Type</label>
+      <select
+        class="field-select"
+        [(ngModel)]="filterType"
+      >
+        <option value="all">All</option>
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Category</label>
+      <select
+        class="field-select"
+        [(ngModel)]="filterCategoryId"
+      >
+        <option [ngValue]="'all'">All</option>
+        <option *ngFor="let cat of categories" [ngValue]="cat.id">
+          {{ cat.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="field align-end">
+      <button class="btn-secondary" (click)="applyFilters()">
+        Apply filters
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Transactions List -->
+<div class="transactions-list">
+  <!-- Empty state -->
+  <div
+    *ngIf="filteredTransactions.length === 0"
+    class="empty-state"
+  >
+    No transactions found. Try adjusting your filters or add a new transaction above.
+  </div>
+
+  <!-- Row cards -->
+  <div
+    *ngFor="let t of filteredTransactions"
+    class="transaction-card"
+    (click)="toggleDetails(t.id)"
+  >
+    <div class="transaction-main">
+      <!-- Left: avatar -->
+      <div class="transaction-left">
+        <div
+          class="transaction-avatar"
+          [ngClass]="t.type"
+        >
+          {{ t.type === 'income' ? '+' : '-' }}
+        </div>
+      </div>
+
+      <!-- Center: amount, category, description -->
+      <div class="transaction-center">
+        <div class="transaction-amount-row">
+          <span
+            class="transaction-amount"
+            [ngClass]="t.type"
+          >
+            {{ t.type === 'income' ? '+' : '-' }}{{ t.amount | number:'1.2-2' }}
+          </span>
+          <span class="transaction-type-pill">
+            {{ t.type | titlecase }}
+          </span>
+        </div>
+
+        <div class="transaction-meta-row">
+          <span class="transaction-category-pill">
+            {{ getCategoryLabel(t) }}
+          </span>
+          <span
+            *ngIf="t.description"
+            class="transaction-description"
+          >
+            • {{ t.description }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Right: date + actions -->
+      <div class="transaction-right">
+        <div class="transaction-date">
+          {{ t.date | date: 'yyyy-MM-dd' }}
+        </div>
+        <div class="action-buttons">
+          <button
+            class="btn btn-ghost"
+            (click)="editTransaction(t); $event.stopPropagation()"
+          >
+            Edit
+          </button>
+          <button
+            class="btn btn-danger-ghost"
+            (click)="deleteTransaction(t.id); $event.stopPropagation()"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expanded details (optional extra info) -->
+    <div
+      *ngIf="expandedId === t.id"
+      class="transaction-details-expanded"
+    >
+      <div class="detail-row">
+        <div class="detail-label">Description</div>
+        <div class="detail-value">
+          {{ t.description || 'No description' }}
+        </div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Category</div>
+        <div class="detail-value">
+          {{ getCategoryLabel(t) }}
+        </div>
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">Date</div>
+        <div class="detail-value">
+          {{ t.date | date: 'fullDate' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

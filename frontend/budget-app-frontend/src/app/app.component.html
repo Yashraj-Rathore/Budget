@@ -8,15 +8,12 @@
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
 <!-- app.component.html -->
-<nav>
-  <a routerLink="/dashboard">Dashboard</a> |
-  <a routerLink="/transactions">Transactions</a> |
-  <a routerLink="/categories">Categories</a> |
-  <a routerLink="/budget-summary">Budget Summary</a> |
-  <a routerLink="/spending-analysis">spending-analysis</a>
+<div class="layout-container">
+  <app-sidebar></app-sidebar>
 
-</nav>
-
-<router-outlet></router-outlet>
-
+  <div class="main-content">
+    <app-navbar></app-navbar>
+    <router-outlet></router-outlet>
+  </div>
+</div>
 

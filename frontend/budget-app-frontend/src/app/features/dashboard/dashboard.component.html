@@ -1,0 +1,87 @@
+<div class="dashboard-container">
+  <!-- HEADER -->
+  <div class="dashboard-header">
+    <h1>Welcome to Your Financial Dashboard</h1>
+    <p>Here you can see an overview of your financial health.</p>
+  </div>
+
+  <!-- TOP SUMMARY CARDS -->
+  <div class="cards-row">
+    <!-- TOTAL INCOME -->
+    <div class="card income">
+      <div class="card-title">Total Income</div>
+      <div class="card-value">
+        {{ totalIncome | currency : 'USD' : 'symbol' : '1.0-0' }}
+      </div>
+      <div class="card-meta">Your total income to date.</div>
+    </div>
+
+    <!-- TOTAL EXPENSES -->
+    <div class="card expenses">
+      <div class="card-title">Total Expenses</div>
+      <div class="card-value">
+        {{ totalExpenses | currency : 'USD' : 'symbol' : '1.0-0' }}
+      </div>
+      <div class="card-meta">Your total expenses to date.</div>
+    </div>
+
+    <!-- CURRENT BALANCE -->
+    <div class="card balance">
+      <div class="card-title">Current Balance</div>
+      <div class="card-value">
+        {{ currentBalance | currency : 'USD' : 'symbol' : '1.0-0' }}
+      </div>
+      <div class="card-meta">Balance after all expenses.</div>
+    </div>
+  </div>
+
+  <!-- SEPARATE INSIGHTS PANEL -->
+  <div class="insights-row" *ngIf="biggestMonthLabel || topCategoryLabel">
+    <div class="insights-card">
+      <div class="insights-header">
+        <span class="insights-dot"></span>
+        <span class="insights-title">Spending Highlights</span>
+      </div>
+
+      <div class="insights-body">
+        <div class="insight-row" *ngIf="biggestMonthLabel">
+          <div class="insight-label">Biggest Month</div>
+          <div class="insight-value">
+            <span class="insight-main">{{ biggestMonthLabel }}</span>
+            <span class="insight-sub">
+              {{ biggestMonthAmount | currency : 'USD' : 'symbol' : '1.0-0' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="insight-row" *ngIf="topCategoryLabel">
+          <div class="insight-label">Top Category</div>
+          <div class="insight-value">
+            <span class="insight-main">{{ topCategoryLabel }}</span>
+            <span class="insight-sub">
+              {{ topCategoryAmount | currency : 'USD' : 'symbol' : '1.0-0' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-container">
+    <div class="chart-card">
+      <h3>Monthly Spending</h3>
+      <canvas id="monthlySpendingChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Spending by Category</h3>
+      <canvas id="categoryChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Income vs Expenses</h3>
+      <canvas id="incomeExpenseChart"></canvas>
+    </div>
+  </div>
+</div>

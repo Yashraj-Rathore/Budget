@@ -1,186 +1,147 @@
 # spending_analysis.py
 
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
 import pandas as pd
+import numpy as np
+from datetime import datetime
 from .models import Transaction
 from sklearn.linear_model import LinearRegression
-import matplotlib.pyplot as plt
-import io
-import base64
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+
 
 class SpendingAnalysis:
+    # ---------------------------
+    #  Fetch DB -> DataFrame
+    # ---------------------------
     @staticmethod
     def fetch_transactions(user):
-        """
-        Fetch transactions for the user from the database.
-        """
-        transactions = Transaction.objects.all()
-        data = []
+        qs = Transaction.objects.filter(user=user).select_related("category")
 
-        for transaction in transactions:
-            data.append({
-                "amount": transaction.amount,
-                "category": transaction.category.name,
-                "type": transaction.type,
-                "date": transaction.date
-            })
+        data = [
+            {
+                "amount": float(t.amount),
+                "category": t.category.name,
+                "type": t.type,
+                "date": t.date,
+            }
+            for t in qs
+        ]
 
         return pd.DataFrame(data)
 
+
+    # ---------------------------
+    #  Core Analysis
+    # ---------------------------
     @staticmethod
     def analyze_spending(data):
-        """
-        Analyze the user's spending habits.
-        """
-        # Ensure there's data to analyze
         if data.empty:
             return {"error": "No data available for analysis"}
 
-        # Calculate total spent by category
-        category_spending = data[data['type'] == 'expense'].groupby('category')['amount'].sum().reset_index()
+        df = data.copy()
+        df["date"] = pd.to_datetime(df["date"])
+        df["month"] = df["date"].dt.to_period("M").astype(str)
 
-        # Total income and expenses
-        total_income = data[data['type'] == 'income']['amount'].sum()
-        total_expenses = data[data['type'] == 'expense']['amount'].sum()
+        # summary
+        total_income = df[df["type"] == "income"]["amount"].sum()
+        total_expenses = df[df["type"] == "expense"]["amount"].sum()
+        balance = total_income - total_expenses
 
-        # Monthly spending trends (sum of expenses by month)
-        data['month'] = pd.to_datetime(data['date']).dt.to_period('M').astype(str)
-        monthly_spending = data[data['type'] == 'expense'].groupby('month')['amount'].sum().reset_index()
+        # top categories
+        by_cat = (
+            df[df["type"] == "expense"]
+            .groupby("category", as_index=False)["amount"]
+            .sum()
+            .sort_values("amount", ascending=False)
+        )
 
-        return {
-            "category_spending": category_spending.to_dict('records'),
-            "total_income": total_income,
-            "total_expenses": total_expenses,
-            "monthly_spending": monthly_spending.to_dict('records')
-        }
+        total_exp = max(total_expenses, 1e-9)
+        by_cat["share"] = (by_cat["amount"] / total_exp).round(4)
 
-    @staticmethod
-    def provide_recommendations(data):
-        """
-        Provide spending recommendations based on past habits.
-        """
-        # Simple example of an ML model to predict next month's spending based on past spending
-        if data.empty:
-            return {"error": "No data available for predictions"}
+        # month trends
+        monthly = (
+            df[df["type"] == "expense"]
+            .groupby("month", as_index=False)["amount"]
+            .sum()
+            .sort_values("month")
+        )
 
-        # Extract features and target for the model
-        data['month'] = pd.to_datetime(data['date']).dt.month
-        expense_data = data[data['type'] == 'expense']
-
-        if len(expense_data) < 2:
-            return {"recommendations": "Not enough data to provide predictions"}
-
-        # Prepare training data for regression
-        X = expense_data[['month']].values
-        y = expense_data['amount'].values
-
-        # Train the model
-        model = LinearRegression()
-        model.fit(X, y)
-
-        # Predict spending for the next month
-        next_month = [[(X[-1][0] % 12) + 1]]
-        predicted_expense = model.predict(next_month)[0]
-
-        # Prepare recommendations
-        recommendations = f"Based on your spending pattern, you may spend approximately ${predicted_expense:.2f} next month. Consider optimizing expenses in high-spending categories."
+        monthly["mom_delta"] = monthly["amount"].pct_change().fillna(0).round(4)
 
         return {
-            "predicted_next_month_expense": predicted_expense,
-            "recommendations": recommendations
+            "summary": {
+                "total_income": float(total_income),
+                "total_expenses": float(total_expenses),
+                "balance": float(balance),
+            },
+            "category_spending": by_cat.to_dict("records"),
+            "monthly_spending": monthly.to_dict("records"),
         }
 
+
+    # ---------------------------
+    #  Rolling Average Forecast
+    # ---------------------------
     @staticmethod
-    def categorize_spending(data):
-        """
-        Categorize spending by type (e.g., essentials, discretionary).
-        """
+    def forecast_next_month(data, window=3):
         if data.empty:
-            return {"error": "No data available for categorization"}
+            return {
+                "predicted_expense": 0.0,
+                "method": "rolling_average",
+            }
 
-        categories = data['category'].unique()
-        categorized_spending = {category: data[data['category'] == category]['amount'].sum() for category in categories}
+        df = data.copy()
+        df["date"] = pd.to_datetime(df["date"])
+        df["month"] = df["date"].dt.to_period("M")
 
-        return categorized_spending
+        monthly = (
+            df[df["type"] == "expense"]
+            .groupby("month", as_index=False)["amount"]
+            .sum()
+            .sort_values("month")
+        )
 
+        values = monthly["amount"].astype(float).values
+
+        if len(values) == 0:
+            pred = 0.0
+        else:
+            k = min(window, len(values))
+            pred = float(np.mean(values[-k:]))
+
+        return {
+            "predicted_expense": round(pred, 2),
+            "method": f"rolling_average_{window}m",
+        }
+
+
+    # ---------------------------
+    #  Recurring Detection (Light)
+    # ---------------------------
     @staticmethod
-    def detect_irregular_spending(data):
-        """
-        Detect irregular spending patterns.
-        """
+    def detect_recurring(data, tolerance=0.05):
         if data.empty:
-            return {"error": "No data available for detecting irregularities"}
+            return []
 
-        expense_data = data[data['type'] == 'expense']
-        if len(expense_data) < 2:
-            return {"irregularities": "Not enough data to detect irregular spending"}
+        df = data.copy()
+        df["date"] = pd.to_datetime(df["date"])
+        df = df[df["type"] == "expense"]
 
-        avg_expense = expense_data['amount'].mean()
-        irregularities = expense_data[expense_data['amount'] > (avg_expense * 1.5)]
+        # group by approx amount bucket + category
+        df["amt_band"] = (df["amount"].astype(float) // 5) * 5
 
-        return irregularities.to_dict('records')
+        rec = (
+            df.groupby(["category", "amt_band"])
+            .agg(
+                count=("amount", "size"),
+                first_date=("date", "min"),
+                last_date=("date", "max"),
+            )
+            .reset_index()
+        )
 
-    @staticmethod
-    def top_spending_categories(data):
-        """
-        Get the top spending categories.
-        """
-        if data.empty:
-            return {"error": "No data available for top categories"}
-	
-     # Convert the 'amount' column to numeric if it's not already
+        rec["months_span"] = ((rec["last_date"] - rec["first_date"]).dt.days / 30.0).clip(lower=1)
+        rec["avg_per_month"] = rec["count"] / rec["months_span"]
 
-        data['amount'] = pd.to_numeric(data['amount'], errors='coerce')
-    
-    # Ensure no NaN values are present
-        data.dropna(subset=['amount'], inplace=True)	
-        
-        top_categories = data[data['type'] == 'expense'].groupby('category')['amount'].sum().nlargest(3).reset_index()
-        return top_categories.to_dict('records')
+        # Naive approach: if appears ~ monthly
+        candidates = rec[rec["avg_per_month"] >= 0.8].copy()
 
-    @staticmethod
-    def check_budget_limits(data, category_limits):
-        """
-        Check if spending exceeds set budget limits for categories.
-        """
-        if data.empty:
-            return {"error": "No data available for budget checks"}
-
-        alerts = []
-        for category, limit in category_limits.items():
-            total_spent = data[(data['category'] == category) & (data['type'] == 'expense')]['amount'].sum()
-            if total_spent > limit:
-                alerts.append(f"Spending for {category} exceeds the limit of ${limit}")
-
-        return alerts
-
-    @staticmethod
-    def generate_spending_trend_plot(data):
-        """
-        Generate a spending trend plot and return it as a base64-encoded string.
-        """
-        if data.empty:
-            return ""
-
-        data['month'] = pd.to_datetime(data['date']).dt.to_period('M')
-        monthly_spending = data[data['type'] == 'expense'].groupby('month')['amount'].sum().reset_index()
-
-        plt.figure(figsize=(10, 6))
-        plt.plot(monthly_spending['month'].astype(str), monthly_spending['amount'], marker='o', linestyle='-', color='b')
-        plt.xlabel('Month')
-        plt.ylabel('Total Spending ($)')
-        plt.title('Monthly Spending Trend')
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-
-        buf = io.BytesIO()
-        plt.savefig(buf, format='png')
-        buf.seek(0)
-        encoded_image = base64.b64encode(buf.read()).decode('utf-8')
-        buf.close()
-
-        return encoded_image
+        return candidates[["category", "amt_band", "count"]].to_dict("records")

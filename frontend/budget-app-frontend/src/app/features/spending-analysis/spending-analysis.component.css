@@ -1,0 +1,196 @@
+/* Root layout */
+.spending-page {
+  padding: 24px;
+  color: #e5e7eb;
+  background-color: #020617;
+  min-height: 100vh;
+}
+
+/* Header */
+.summary-header {
+  margin-bottom: 24px;
+}
+
+.summary-header h1 {
+  font-size: 1.9rem;
+  margin-bottom: 4px;
+}
+
+.summary-header p {
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+/* Top metric cards */
+.top-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.metric-card {
+  background: #020617;
+  border-radius: 12px;
+  border: 1px solid #111827;
+  padding: 16px 18px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9ca3af;
+  margin-bottom: 6px;
+}
+
+.metric-value {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.metric-caption {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+/* Filter row */
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 18px;
+  font-size: 0.85rem;
+}
+
+.filter-row label {
+  color: #9ca3af;
+}
+
+.filter-row select {
+  background: #020617;
+  border-radius: 8px;
+  border: 1px solid #1f2937;
+  color: #e5e7eb;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+}
+
+/* Card shell used everywhere */
+.card {
+  background: #020617;
+  border-radius: 12px;
+  border: 1px solid #111827;
+  padding: 16px 18px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+/* Middle layout: charts */
+.middle-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.chart-card {
+  min-height: 280px;
+}
+
+.card-title {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+  margin-bottom: 10px;
+}
+
+/* Canvas styling */
+canvas {
+  width: 100% !important;
+  max-height: 320px;
+  background: #020617;
+}
+
+/* Category list under pie chart */
+.category-list {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  border-top: 1px solid #111827;
+  padding-top: 8px;
+}
+
+.category-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.category-row span:last-child {
+  color: #e5e7eb;
+  font-weight: 500;
+}
+
+/* Bottom layout: recurring + insights */
+.bottom-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
+  gap: 18px;
+  margin-top: 6px;
+}
+
+/* Recurring table */
+.recurring-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.recurring-table th,
+.recurring-table td {
+  padding: 8px 6px;
+  text-align: left;
+}
+
+.recurring-table thead {
+  border-bottom: 1px solid #111827;
+  color: #9ca3af;
+}
+
+.recurring-table tbody tr:nth-child(odd) {
+  background: #020617;
+}
+
+.recurring-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #022c22;
+  color: #6ee7b7;
+  font-size: 0.75rem;
+}
+
+/* Insights & recommendations */
+.insights-list,
+.recommendations-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  font-size: 0.85rem;
+}
+
+.insights-list li + li,
+.recommendations-list li + li {
+  margin-top: 4px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 960px) {
+  .middle-layout,
+  .bottom-layout {
+    grid-template-columns: 1fr;
+  }
+}

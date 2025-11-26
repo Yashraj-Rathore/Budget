@@ -1,0 +1,172 @@
+<div class="spending-page">
+  <!-- Header -->
+  <div class="summary-header">
+    <h1>Spending Analysis</h1>
+    <p>
+      Deep dive into your long-term spending patterns, forecasts, and recurring
+      expenses. Use this view to spot habits, subscriptions, and months where
+      spending spikes.
+    </p>
+  </div>
+
+  <!-- Top metrics -->
+  <div class="top-metrics">
+    <div class="metric-card">
+      <div class="metric-label">Total Tracked Spending</div>
+      <div class="metric-value">
+        {{ totalExpensesOverall | currency }}
+      </div>
+      <div class="metric-caption">
+        Sum of all expenses across your history.
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-label">Average Monthly Spend</div>
+      <div class="metric-value">
+        {{ avgMonthlySpend | currency }}
+      </div>
+      <div class="metric-caption">
+        Based on the months we have data for.
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-label">This Month's Spend</div>
+      <div class="metric-value">
+        {{ currentMonthSpend | currency }}
+      </div>
+      <div class="metric-caption">
+        All expenses recorded in the current calendar month.
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-label">Next Month Forecast</div>
+      <div class="metric-value">
+        {{ predictedNextMonthSpend | currency }}
+      </div>
+      <div class="metric-caption">
+        Rolling average prediction based on recent months.
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-row">
+    <label for="month">Month filter</label>
+    <select
+      id="month"
+      [(ngModel)]="selectedMonth"
+      (change)="onMonthChange()"
+    >
+      <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+    </select>
+  </div>
+
+  <!-- Charts + Category breakdown -->
+  <div class="middle-layout">
+    <!-- Trend chart -->
+    <div class="card chart-card">
+      <div class="card-title">Spending Trend</div>
+      <canvas id="trendChart"></canvas>
+    </div>
+
+    <!-- Category breakdown + list -->
+    <div class="card chart-card">
+      <div class="card-title">Top Spending Categories</div>
+      <canvas id="categoryBreakdownChart"></canvas>
+
+      <div class="category-list" *ngIf="topCategories?.length">
+        <div class="category-row" *ngFor="let c of topCategories">
+          <span>{{ c.category }}</span>
+          <span>{{ c.amount | currency }}</span>
+        </div>
+      </div>
+      <div *ngIf="!topCategories?.length" class="category-list">
+        <span style="font-size: 0.85rem; color: #9ca3af;">
+          No category data yet. Add a few expenses to see where your money
+          goes.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recurring + Insights / Recommendations -->
+  <div class="bottom-layout">
+    <!-- Recurring expenses -->
+    <div class="card">
+      <div class="card-title">Recurring Expenses &amp; Subscriptions</div>
+      <table
+        class="recurring-table"
+        *ngIf="recurringExpenses?.length; else noRecurring"
+      >
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Typical Amount</th>
+            <th>Occurrences</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of recurringExpenses">
+            <td>{{ r.category }}</td>
+            <td>{{ r.amt_band | currency }}</td>
+            <td>
+              <span class="recurring-chip">
+                {{ r.count }}×
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #noRecurring>
+        <p style="font-size: 0.85rem; color: #9ca3af;">
+          Once we detect repeated charges (like rent or subscriptions), they’ll
+          show up here so you can quickly review your fixed monthly
+          commitments.
+        </p>
+      </ng-template>
+    </div>
+
+    <!-- Insights + recommendations -->
+    <div class="card">
+      <div class="card-title">Insights &amp; Recommendations</div>
+
+      <ul class="insights-list">
+        <li *ngIf="topCategoryName">
+          Your highest spending category overall is
+          <strong>{{ topCategoryName }}</strong>
+          ({{ topCategoryAmount | currency }} total).
+        </li>
+        <li *ngIf="avgMonthlySpend">
+          On average you spend
+          <strong>{{ avgMonthlySpend | currency }}</strong>
+          per month.
+        </li>
+        <li *ngIf="currentMonthSpend">
+          You've already spent
+          <strong>{{ currentMonthSpend | currency }}</strong>
+          this month.
+        </li>
+
+        <li *ngFor="let insight of insights">
+          {{ insight }}
+        </li>
+      </ul>
+
+      <h4 style="margin-top: 12px; font-size: 0.9rem; color: #9ca3af;">
+        Smart suggestions
+      </h4>
+      <ul class="recommendations-list">
+        <li *ngFor="let r of recommendationsList">
+          {{ r }}
+        </li>
+        <li *ngIf="!recommendationsList?.length && !insights?.length">
+          Start adding more transactions to unlock personalised tips about your
+          spending patterns.
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

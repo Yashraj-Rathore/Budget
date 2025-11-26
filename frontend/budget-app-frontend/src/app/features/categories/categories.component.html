@@ -1,0 +1,93 @@
+<div class="categories-page-container">
+  <div class="categories-header">
+    <h2>Manage Categories</h2>
+    <p class="subtitle">
+      Define your spending buckets and optional limits. These categories appear across your dashboard.
+    </p>
+  </div>
+
+  <!-- FORM -->
+  <div class="categories-card">
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <div class="field">
+          <label for="name">Category name</label>
+          <input
+            id="name"
+            [(ngModel)]="category.name"
+            name="name"
+            type="text"
+            class="category-input"
+            placeholder="e.g. Groceries"
+            required
+          />
+        </div>
+
+        <div class="field">
+          <label for="limit">Monthly budget limit</label>
+          <input
+            id="limit"
+            [(ngModel)]="category.budget_limit"
+            name="budget_limit"
+            type="number"
+            class="category-input"
+            placeholder="e.g. 400"
+            min="0"
+          />
+        </div>
+
+        <div class="field">
+          <label for="color">Colour</label>
+          <div class="color-row">
+            <input
+              id="color"
+              [(ngModel)]="category.color"
+              name="color"
+              type="color"
+              class="color-input"
+            />
+            <span class="color-hex">{{ category.color }}</span>
+          </div>
+        </div>
+
+        <div class="field button-field">
+          <button class="btn-primary" type="submit">
+            {{ category.id ? 'Update' : 'Add' }} Category
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- LIST -->
+  <div class="categories-card">
+    <ul class="category-list">
+      <li *ngFor="let cat of categories" class="category-item">
+        <div class="category-main">
+          <div class="category-dot" [style.background-color]="cat.color || '#4ade80'"></div>
+
+          <div class="category-text">
+            <div class="category-name">{{ cat.name }}</div>
+            <div class="category-meta">
+              <span *ngIf="cat.budget_limit; else noLimit">
+                Limit <strong>{{ cat.budget_limit | currency }}</strong>
+              </span>
+              <ng-template #noLimit>
+                <span class="no-limit">No limit set</span>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn edit-btn" (click)="editCategory(cat)">Edit</button>
+          <button class="btn delete-btn" (click)="deleteCategory(cat.id)">Delete</button>
+        </div>
+      </li>
+    </ul>
+
+    <div class="empty-state" *ngIf="categories.length === 0">
+      You don’t have any categories yet. Create one above.
+    </div>
+  </div>
+</div>

@@ -1,24 +1,37 @@
 from rest_framework import serializers
-from .models import Transaction, Category
-from django.contrib.auth.models import User  # Import the User model
+from .models import Transaction, Category, BudgetLimit, FinancialGoal
+
+
+class BudgetLimitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BudgetLimit
+        fields = "__all__"
+        read_only_fields = ("user",)
+
+
+class FinancialGoalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FinancialGoal
+        fields = "__all__"
+        read_only_fields = ("user",)
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
+        # Because we added `color` and `budget_limit` to the model,
+        # they are automatically included here.
+        fields = "__all__"
 
 
 class TransactionSerializer(serializers.ModelSerializer):
-    category_name = serializers.ReadOnlyField(source='category.name')  # Add field for category name for easy frontend consumption
+    category_name = serializers.ReadOnlyField(source="category.name")
 
     class Meta:
         model = Transaction
-        fields = '__all__'
+        fields = "__all__"
+        read_only_fields = ("user",)  # user is set in the view
 
-    # Override the create method to set the user automatically or make it optional
     def create(self, validated_data):
-        # If user is not provided, you can set a default one here (for example, the first user)
-        if 'user' not in validated_data:
-            # Assuming you have at least one user in the DB. Replace this line accordingly.
-            validated_data['user'] = User.objects.first()
+        # user is set in viewset.perform_create
         return super().create(validated_data)

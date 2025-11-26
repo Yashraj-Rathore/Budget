@@ -1,0 +1,259 @@
+/* PAGE CONTAINER (same width as transactions) */
+.categories-page-container {
+  max-width: 1180px;
+  margin: 0 auto;
+  margin-top: 20px;
+}
+
+/* HEADER */
+.categories-header h2 {
+  color: #f9fafb;
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: #9ca3af;
+  margin-bottom: 16px;
+}
+
+/* DARK CARD (matches transactions) */
+.categories-card {
+  background: #020617;
+  border: 1px solid #1f2937;
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55);
+}
+
+/* GRID FORM */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.field label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+/* INPUTS – NOW TEXT IS BLACK */
+.category-input {
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: 1px solid #374151;
+  outline: none;
+  background: #ffffff; /* white background */
+  color: #111827;      /* BLACK TEXT */
+}
+
+.category-input:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.4);
+}
+
+.color-input {
+  width: 40px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #374151;
+}
+
+.color-hex {
+  color: #e5e7eb;
+}
+
+/* BUTTONS – MATCH TRANSACTIONS */
+.btn-primary {
+  background: #22c55e;
+  color: #0b1120;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #16a34a;
+}
+
+.btn {
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+}
+
+/* EDIT/DELETE BUTTONS */
+.edit-btn {
+  background: #facc15;
+  color: #111827;
+}
+
+.edit-btn:hover {
+  background: #eab308;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: #f9fafb;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+/* CATEGORY LIST */
+.category-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0f172a;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+.category-item:hover {
+  border-color: #22c55e55;
+}
+
+/* LEFT SIDE OF CATEGORY ROW */
+.category-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.category-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+}
+
+.category-name {
+  color: #f1f5f9;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.category-meta {
+  color: #cbd5e1;
+  font-size: 0.8rem;
+}
+
+.no-limit {
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* EMPTY STATE */
+.empty-state {
+  padding: 10px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+/* Ensures each field aligns evenly */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  align-items: end; /* aligns color + button perfectly */
+  gap: 18px;
+}
+
+/* Color row horizontal alignment */
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Make sure the category hex text lines up vertically */
+.color-hex {
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  padding-bottom: 4px;
+}
+
+/* Make the button sit at the bottom aligned with inputs */
+.button-field {
+  display: flex;
+  align-items: end;
+}
+
+/* Button height matches input fields */
+.btn-primary {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Fix spacing so the category name + limit matches height */
+.field label {
+  margin-bottom: 6px;
+}
+
+/* Make each field stack label above input */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* space between label and input */
+}
+
+/* Grid layout: 3 fields + button */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 20px;
+  align-items: end; /* aligns Add button with bottom row */
+}
+
+/* Fix label styling */
+.field label {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Color row inside the color field */
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Adjust vertical alignment of color hex */
+.color-hex {
+  color: #e5e7eb;
+  font-size: 0.88rem;
+  margin-top: 2px;
+}
+
+/* Ensure Add Category button aligns properly */
+.button-field {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}

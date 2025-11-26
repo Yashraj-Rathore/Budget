@@ -6,12 +6,13 @@ import { provideClientHydration } from '@angular/platform-browser';
 import { importProvidersFrom } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideClientHydration(),
-    provideHttpClient(withFetch()),  // Add provideHttpClient with withFetch() to enable the fetch API
+    provideHttpClient(withFetch()), provideAnimationsAsync(),  // Add provideHttpClient with withFetch() to enable the fetch API
   ]
 };
