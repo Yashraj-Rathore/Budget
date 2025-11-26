@@ -1,0 +1,18 @@
+# Ignore Angular build output (not real TypeScript source)
+frontend/**/dist/* linguist-vendored=true
+frontend/**/build/* linguist-vendored=true
+
+# Ignore all node_modules to stop them from inflating TypeScript
+frontend/**/node_modules/* linguist-vendored=true
+
+# Ignore compiled JS output if any exists
+frontend/**/out/* linguist-vendored=true
+
+# Ignore environment/config files if large
+frontend/**/environments/*.ts linguist-vendored=true
+
+# Mark Django migrations as not “main language”
+backend/**/migrations/* linguist-vendored=true
+
+# Ensure GitHub focuses on actual Python source code
+backend/**/*.py linguist-detectable=true
